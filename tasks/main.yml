@@ -1,0 +1,85 @@
+---
+# tasks file for ohmyzsh
+- name: make shure that git, curl and zsh is installed for user {{ user }}
+  dnf:
+    name:
+      - zsh
+      - curl
+      - git
+    state: present
+    update_cache: yes
+  become: yes
+  when: ansible_facts['os_family'] == "RedHat"
+- name: make shure that git, curl and zsh is installed for user {{ user }}
+  apt:
+    name:
+      - zsh
+      - curl
+      - git
+    state: present
+    update_cache: yes
+  become: yes
+  when: ansible_facts['os_family'] == "Debian"
+
+- name: check for .oh-my-zsh exists in ~/ for user {{ user }}
+  become: yes
+  become_user: "{{ user }}"  
+  stat: path=~/.oh-my-zsh
+  register: diruser
+
+- name: install oh-my-zsh for user {{ user }}
+  become: yes
+  become_user: "{{ user }}"
+  shell:
+    cmd: sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)" "" --unattended
+  when: not diruser.stat.exists
+
+- name: clone zsh plugin autosuggestions for user {{ user }}
+  become: yes
+  become_user: "{{ user }}"
+  git:
+    repo: https://github.com/zsh-users/zsh-autosuggestions.git
+    dest: ~/.oh-my-zsh/custom/plugins/zsh-autosuggestions/
+    force: yes
+    version: master
+
+- name: clone zsh plugin zsh-syntax-highlighting for user {{ user }}
+  become: yes
+  become_user: "{{ user }}"
+  git:
+    repo: https://github.com/zsh-users/zsh-syntax-highlighting.git
+    dest: ~/.oh-my-zsh/custom/plugins/zsh-syntax-highlighting/
+    force: yes
+    version: master
+
+- name: set theme in ~/.zshrc for user {{ user }}
+  become: yes
+  become_user: "{{ user }}"
+  lineinfile:
+    path: ~/.zshrc
+    regexp: ZSH_THEME="robbyrussell"
+    line: ZSH_THEME="{{ zsh_theme }}"
+
+- name: set plugins in ~/.zshrc for user {{ user }}
+  become: yes
+  become_user: "{{ user }}"
+  lineinfile:
+    path: ~/.zshrc
+    regexp: plugins=\(git\)
+    line: plugins=(git {{ zsh_plugins }})
+
+- name: set ls aliase in ~/.zshrc for user {{ user }}
+  become: yes
+  become_user: "{{ user }}"
+  blockinfile:
+    path: ~/.zshrc
+    insertafter: E0F
+    block: |
+      alias ll="ls -l"
+      alias la="ls -la"
+
+- name: set zsh as default shell for user {{ user }}
+  user: 
+    name: "{{ user }}" 
+    shell: /bin/zsh
+  become: yes

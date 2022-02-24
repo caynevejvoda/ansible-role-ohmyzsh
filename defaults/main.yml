@@ -1,0 +1,5 @@
+---
+# defaults file for ohmyzsh
+user: root
+zsh_theme: agnoster
+zsh_plugins: colored-man-pages ansible zsh-syntax-highlighting zsh-autosuggestions docker vi-mode z common-aliases

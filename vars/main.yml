@@ -1,0 +1,6 @@
+---
+# vars file for ohmyzsh
+vars:
+  user:
+  zsh_theme:
+  zsh_plugins:
