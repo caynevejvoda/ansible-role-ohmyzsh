@@ -1,72 +1,77 @@
----
-# defaults file for ohmyzsh
-user: 
-  - root
+######################################
+## This file is managed by Ansible. ##
+######################################
 
-#####################
-## 3 party Plugins ##
-#####################
-custom_plugins: false
-plugin_urls:
-  - https://github.com/zsh-users/zsh-autosuggestions.git
-  - https://github.com/zsh-users/zsh-syntax-highlighting.git
-plugin_names:
-  - zsh-autosuggestions
-  - zsh-syntax-highlighting
+# Enable Powerlevel10k instant prompt. Should stay close to the top of ~/.zshrc.
+# Initialization code that may require console input (password prompts, [y/n]
+# confirmations, etc.) must go above this block; everything else may go below.
 
-####################
-## zshrc template ##
-####################
+# If you come from bash you might have to change your $PATH.
+{% if ZSH_CUSTOM_BOL %}
+export PATH="{{ PATH }}"
+{% else %}
+# export PATH=$HOME/bin:/usr/local/bin:$PATH
+{% endif %}
 
+# Path to your oh-my-zsh installation.
+{% if item == 'root' %}
+export ZSH="/{{ item }}/.oh-my-zsh"
+{% else %}
+export ZSH="/home/{{ item }}/.oh-my-zsh"
+{% endif %}
 # Set name of the theme to load --- if set to "random", it will
 # load a random theme each time oh-my-zsh is loaded, in which case,
 # to know which specific one was loaded, run: echo $RANDOM_THEME
 # See https://github.com/ohmyzsh/ohmyzsh/wiki/Themes
-ZSH_THEME: agnoster
+ZSH_THEME="{{ ZSH_THEME }}"
 
 # Set list of themes to pick from when loading at random
 # Setting this variable when ZSH_THEME=random will cause zsh to load
 # a theme from this variable instead of looking in $ZSH/themes/
 # If set to an empty array, this variable will have no effect.
-# ZSH_THEME_RANDOM_CANDIDATES=( {{ ZSH_THEME_RANDOM_CANDIDATES }} )
-ZSH_THEME_RANDOM_CANDIDATES_BOL: false
+{% if ZSH_THEME_RANDOM_CANDIDATES_BOL %}
+ZSH_THEME_RANDOM_CANDIDATES=( \{\{ ZSH_THEME_RANDOM_CANDIDATES \}\} )
+{% else %}
+# ZSH_THEME_RANDOM_CANDIDATES=( \{\{ ZSH_THEME_RANDOM_CANDIDATES \}\} )
+{% endif %}
 
 # Uncomment the following line to use case-sensitive completion.
-CASE_SENSITIVE: false
+CASE_SENSITIVE="{{ CASE_SENSITIVE }}"
 
 # Uncomment the following line to use hyphen-insensitive completion.
 # Case-sensitive completion must be off. _ and - will be interchangeable.
-HYPHEN_INSENSITIVE: false
+HYPHEN_INSENSITIVE="{{ HYPHEN_INSENSITIVE }}"
 
 # Uncomment the following line to disable bi-weekly auto-update checks.
-DISABLE_AUTO_UPDATE: false
+DISABLE_AUTO_UPDATE="{{ DISABLE_AUTO_UPDATE }}"
 
 # Uncomment the following line to automatically update without prompting.
-DISABLE_UPDATE_PROMPT: false
+DISABLE_UPDATE_PROMPT="{{ DISABLE_UPDATE_PROMPT }}"
 
 # Uncomment the following line to change how often to auto-update (in days).
-UPDATE_ZSH_DAYS: false
+export UPDATE_ZSH_DAYS="{{ UPDATE_ZSH_DAYS }}"
+
 # Uncomment the following line if pasting URLs and other text is messed up.
-DISABLE_MAGIC_FUNCTIONS: false
+DISABLE_MAGIC_FUNCTIONS="{{ DISABLE_MAGIC_FUNCTIONS }}"
 
 # Uncomment the following line to disable colors in ls.
-DISABLE_LS_COLORS: false
+DISABLE_LS_COLORS="{{ DISABLE_LS_COLORS }}"
 
 # Uncomment the following line to disable auto-setting terminal title.
-DISABLE_AUTO_TITLE: false
+DISABLE_AUTO_TITLE="{{ DISABLE_AUTO_TITLE }}"
 
 # Uncomment the following line to enable command auto-correction.
-ENABLE_CORRECTION: false
+ENABLE_CORRECTION="{{ ENABLE_CORRECTION }}"
 
 # Uncomment the following line to display red dots whilst waiting for completion.
 # Caution: this setting can cause issues with multiline prompts (zsh 5.7.1 and newer seem to work)
 # See https://github.com/ohmyzsh/ohmyzsh/issues/5765
-COMPLETION_WAITING_DOTS: false 
+COMPLETION_WAITING_DOTS="{{ COMPLETION_WAITING_DOTS }}"
 
 # Uncomment the following line if you want to disable marking untracked files
 # under VCS as dirty. This makes repository status check for large repositories
 # much, much faster.
-DISABLE_UNTRACKED_FILES_DIRTY: false
+DISABLE_UNTRACKED_FILES_DIRTY="{{ DISABLE_UNTRACKED_FILES_DIRTY }}"
 
 # Uncomment the following line if you want to change the command execution time
 # stamp shown in the history command output.
@@ -74,48 +79,66 @@ DISABLE_UNTRACKED_FILES_DIRTY: false
 # "mm/dd/yyyy"|"dd.mm.yyyy"|"yyyy-mm-dd"
 # or set a custom format using the strftime function format specifications,
 # see 'man strftime' for details.
-HIST_STAMPS: false
+HIST_STAMPS="{{ HIST_STAMPS }}"
 
 # Would you like to use another custom folder than $ZSH/custom?
-ZSH_CUSTOM_BOL: false
-ZSH_CUSTOM: /path/to/new-custom-folder
+{% if ZSH_CUSTOM_BOL %}
+ZSH_CUSTOM="{{ ZSH_CUSTOM }}"
+{% else %}
+# ZSH_CUSTOM=/path/to/new-custom-folder
+{% endif %}
 
 # Which plugins would you like to load?
 # Standard plugins can be found in $ZSH/plugins/
 # Custom plugins may be added to $ZSH_CUSTOM/plugins/
 # Example format: plugins=(rails git textmate ruby lighthouse)
 # Add wisely, as too many plugins slow down shell startup.
-PLUGINS: 
+plugins=(git {{ PLUGINS }})
 
-SOURCE: $ZSH/oh-my-zsh.sh
+source "{{ SOURCE }}"
 
 # User configuration
 
-MANPATH_BOL: false
-MANPATH: '"/usr/local/man:$MANPATH"'
+{% if MANPATH_BOL %}
+MANPATH="{{ MANPATH }}"
+{% else %}
+# export MANPATH="/usr/local/man:$MANPATH"
+{% endif %}
 
 # You may need to manually set your language environment
-LANG_BOL: false
-LANG: en_US.UTF-8
+{% if LANG_BOL %}
+export LANG="{{ LANG }}"
+{% else %}
+# export LANG=en_US.UTF-8
+{% endif %}
 
 # Preferred editor for local and remote sessions
-PREFERRED_EDITOR_BOL: false
-PREFERRED_EDITOR: |
-  if [[ -n $SSH_CONNECTION ]]; then
-    export EDITOR='vim'
-  else
-    export EDITOR='mvim'
-  fi
+{% if PREFERRED_EDITOR_BOL %}
+"{{ PREFERRED_EDITOR }}"
+{% else %}
+# if [[ -n $SSH_CONNECTION ]]; then
+#   export EDITOR='vim'
+# else
+#   export EDITOR='mvim'
+# fi
+{% endif %}
 
 # Compilation flags
-ARCHFLAGS_BOL: false
-ARCHFLAGS: '"-arch x86_64"'
+{% if ARCHFLAGS_BOL %}
+export ARCHFLAGS="{{ ARCHFLAGS }}"
+{% else %}
+# export ARCHFLAGS="-arch x86_64"
+{% endif %}
 
 # Set personal aliases, overriding those provided by oh-my-zsh libs,
 # plugins, and themes. Aliases can be placed here, though oh-my-zsh
 # users are encouraged to define aliases within the ZSH_CUSTOM folder.
 # For a full list of active aliases, run `alias`.
-CUSTOM_OPTIONS: |
-  # Example aliases
-  # alias zshconfig="mate ~/.zshrc"
-  # alias ohmyzsh="mate ~/.oh-my-zsh"
+#
+# Example aliases
+# alias zshconfig="mate ~/.zshrc"
+# alias ohmyzsh="mate ~/.oh-my-zsh"
+#
+#
+#
+{{ CUSTOM_OPTIONS }}

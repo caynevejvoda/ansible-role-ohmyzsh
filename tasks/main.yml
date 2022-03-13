@@ -1,6 +1,6 @@
 ---
 # tasks file for ohmyzsh
-- name: make shure that git, curl and zsh is installed for user {{ user }}
+- name: Make shure that git, curl and zsh is installed.
   dnf:
     name:
       - zsh
@@ -10,7 +10,8 @@
     update_cache: yes
   become: yes
   when: ansible_facts['os_family'] == "RedHat"
-- name: make shure that git, curl and zsh is installed for user {{ user }}
+
+- name: Make shure that git, curl and zsh is installed.
   apt:
     name:
       - zsh
@@ -21,65 +22,44 @@
   become: yes
   when: ansible_facts['os_family'] == "Debian"
 
-- name: check for .oh-my-zsh exists in ~/ for user {{ user }}
+- name: Check if .oh-my-zsh exists in ~/.
   become: yes
-  become_user: "{{ user }}"  
+  become_user: "{{ item }}"  
   stat: path=~/.oh-my-zsh
   register: diruser
+  loop: "{{ user }}"
 
-- name: install oh-my-zsh for user {{ user }}
+- name: Install oh-my-zsh.
   become: yes
-  become_user: "{{ user }}"
+  become_user: "{{ item.0 }}"
   shell:
     cmd: sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)" "" --unattended
-  when: not diruser.stat.exists
+  when: item.1 == False
+  loop: "{{ user | zip(diruser.results|map(attribute='stat.exists'))|list }}"
 
-- name: clone zsh plugin autosuggestions for user {{ user }}
+- name: Clone zsh plugin.
   become: yes
-  become_user: "{{ user }}"
+  become_user: "{{ item.0 }}"
   git:
-    repo: https://github.com/zsh-users/zsh-autosuggestions.git
-    dest: ~/.oh-my-zsh/custom/plugins/zsh-autosuggestions/
+    repo: "{{ item.1.1 }}"
+    dest: "~/.oh-my-zsh/custom/plugins/{{ item.1.0 }}"
     force: yes
     version: master
+  loop: "{{ user | product(plugin_names | zip(plugin_urls)) | list }}"
+  when: custom_plugins | bool
+  
 
-- name: clone zsh plugin zsh-syntax-highlighting for user {{ user }}
+- name: Create .zshrc file from template.
+  ansible.builtin.template:
+    src: .zshrc.j2
+    dest: ~/.zshrc
   become: yes
-  become_user: "{{ user }}"
-  git:
-    repo: https://github.com/zsh-users/zsh-syntax-highlighting.git
-    dest: ~/.oh-my-zsh/custom/plugins/zsh-syntax-highlighting/
-    force: yes
-    version: master
+  become_user: "{{ item }}"
+  loop: "{{ user }}"
 
-- name: set theme in ~/.zshrc for user {{ user }}
-  become: yes
-  become_user: "{{ user }}"
-  lineinfile:
-    path: ~/.zshrc
-    regexp: ZSH_THEME="robbyrussell"
-    line: ZSH_THEME="{{ zsh_theme }}"
-
-- name: set plugins in ~/.zshrc for user {{ user }}
-  become: yes
-  become_user: "{{ user }}"
-  lineinfile:
-    path: ~/.zshrc
-    regexp: plugins=\(git\)
-    line: plugins=(git {{ zsh_plugins }})
-
-- name: set ls aliase in ~/.zshrc for user {{ user }}
-  become: yes
-  become_user: "{{ user }}"
-  blockinfile:
-    path: ~/.zshrc
-    insertafter: E0F
-    block: |
-      alias ll="ls -l"
-      alias la="ls -la"
-
-- name: set zsh as default shell for user {{ user }}
+- name: Set zsh as default shell.
   user: 
-    name: "{{ user }}" 
+    name: "{{ item }}" 
     shell: /bin/zsh
   become: yes
+  loop: "{{ user }}"
