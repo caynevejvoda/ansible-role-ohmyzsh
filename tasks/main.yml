@@ -27,7 +27,7 @@
   become_user: "{{ item }}"  
   stat: path=~/.oh-my-zsh
   register: diruser
-  loop: "{{ user }}"
+  loop: "{{ ohmyzsh_user }}"
 
 - name: Install oh-my-zsh.
   become: yes
@@ -35,7 +35,7 @@
   shell:
     cmd: sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)" "" --unattended
   when: item.1 == False
-  loop: "{{ user | zip(diruser.results|map(attribute='stat.exists'))|list }}"
+  loop: "{{ ohmyzsh_user | zip(diruser.results|map(attribute='stat.exists'))|list }}"
 
 - name: Clone zsh plugin.
   become: yes
@@ -45,8 +45,8 @@
     dest: "~/.oh-my-zsh/custom/plugins/{{ item.1.0 }}"
     force: yes
     version: master
-  loop: "{{ user | product(plugin_names | zip(plugin_urls)) | list }}"
-  when: custom_plugins | bool
+  loop: "{{ ohmyzsh_user | product(ohmyzsh_plugin_names | zip(ohmyzsh_plugin_urls)) | list }}"
+  when: ohmyzsh_custom_plugins | bool
   
 
 - name: Create .zshrc file from template.
@@ -55,11 +55,11 @@
     dest: ~/.zshrc
   become: yes
   become_user: "{{ item }}"
-  loop: "{{ user }}"
+  loop: "{{ ohmyzsh_user }}"
 
 - name: Set zsh as default shell.
   user: 
     name: "{{ item }}" 
     shell: /bin/zsh
   become: yes
-  loop: "{{ user }}"
+  loop: "{{ ohmyzsh_user }}"

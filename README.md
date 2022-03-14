@@ -14,16 +14,16 @@ Available variables are listed below, along with default values (see `defaults/m
 
 It is possible to install and configure ohmyzsh for multiple users.
 
-    user: 
+    ohmyzsh_user: 
       - root
 
 To allow custom plugins, set the variable to true and specify the url's and names.
 
-    custom_plugins: false
-    plugin_urls:
+    ohmyzsh_custom_plugins: false
+    ohmyzsh_plugin_urls:
       - https://github.com/zsh-users/zsh-autosuggestions.git
       - https://github.com/zsh-users/zsh-syntax-highlighting.git
-    plugin_names:
+    ohmyzsh_plugin_names:
       - zsh-autosuggestions
       - zsh-syntax-highlighting
 
