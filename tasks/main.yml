@@ -1,25 +1,25 @@
 ---
 # tasks file for ohmyzsh
-- name: Make shure that git, curl and zsh is installed.
-  package:
+- name: Make shure that git, curl and zsh is installed
+  ansible.builtin.package:
     name:
       - zsh
       - curl
       - git
     state: present
-    update_cache: yes
-  become: yes
+    update_cache: true
+  become: true
   when: ansible_facts['os_family'] == "RedHat"
 
-- name: Make shure that git, curl and zsh is installed.
-  apt:
+- name: Make shure that git, curl and zsh is installed
+  ansible.builtin.apt:
     name:
       - zsh
       - curl
       - git
     state: present
-    update_cache: yes
-  become: yes
+    update_cache: true
+  become: true
   when: ansible_facts['os_family'] == "Debian"
 
 - name: Check if .oh-my-zsh exists in ~/.
@@ -37,29 +37,29 @@
   when: item.1 == False
   loop: "{{ ohmyzsh_user | zip(diruser.results|map(attribute='stat.exists'))|list }}"
 
-- name: Clone zsh plugin.
-  become: yes
-  become_user: "{{ item.0 }}"
-  git:
+- name: Clone zsh plugin
+  ansible.builtin.git:
     repo: "{{ item.1.1 }}"
     dest: "~/.oh-my-zsh/custom/plugins/{{ item.1.0 }}"
-    force: yes
+    force: true
     version: master
-  loop: "{{ ohmyzsh_user | product(ohmyzsh_plugin_names | zip(ohmyzsh_plugin_urls)) | list }}"
-  when: ohmyzsh_custom_plugins | bool
-  
+  become: true
+  become_user: "{{ item.0 }}"
+  loop: "{{ ohmyzsh_user|product(ohmyzsh_plugins|zip(ohmyzsh_plugin_urls))|list }}"
+  when: ohmyzsh_plugins | length > 0
 
-- name: Create .zshrc file from template.
+- name: Create .zshrc file from template
   ansible.builtin.template:
     src: .zshrc.j2
     dest: ~/.zshrc
-  become: yes
+    mode: 0600
+  become: true
   become_user: "{{ item }}"
   loop: "{{ ohmyzsh_user }}"
 
-- name: Set zsh as default shell.
-  user: 
+- name: Set zsh as default shell
+  ansible.builtin.user: 
     name: "{{ item }}" 
     shell: /bin/zsh
-  become: yes
+  become: true
   loop: "{{ ohmyzsh_user }}"
