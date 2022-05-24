@@ -1,7 +1,14 @@
 ---
 - name: Converge
   hosts: all
+  vars:
+    ohmyzsh_plugin_urls:
+      - https://github.com/zsh-users/zsh-autosuggestions.git
+      - https://github.com/zsh-users/zsh-syntax-highlighting.git
+    ohmyzsh_plugins:
+      - zsh-autosuggestions
+      - zsh-syntax-highlighting
   tasks:
-    - name: "Include nakashiugs.ohmyzsh"
-      include_role:
-        name: "nakashiugs.ohmyzsh"
+    - name: Include nakashiugs.ohmyzsh
+      ansible.builtin.include_role:
+        name: caynevejvoda.ohmyzsh
