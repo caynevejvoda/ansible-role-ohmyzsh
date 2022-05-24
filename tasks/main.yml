@@ -22,20 +22,23 @@
   become: true
   when: ansible_facts['os_family'] == "Debian"
 
-- name: Check if .oh-my-zsh exists in ~/.
-  become: yes
-  become_user: "{{ item }}"  
-  stat: path=~/.oh-my-zsh
-  register: diruser
+- name: Create directory
+  ansible.builtin.file:
+    path: ~/.oh-my-zsh
+    owner: "{{ item }}"
+    group: "{{ item }}"
+    mode: 0755
+    state: directory
+  become: true
+  become_user: "{{ item }}"
   loop: "{{ ohmyzsh_user }}"
 
-- name: Install oh-my-zsh.
-  become: yes
-  become_user: "{{ item.0 }}"
-  shell:
-    cmd: sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)" "" --unattended
-  when: item.1 == False
-  loop: "{{ ohmyzsh_user | zip(diruser.results|map(attribute='stat.exists'))|list }}"
+- name: Install ohmyzsh
+  ansible.builtin.git:
+    repo: https://github.com/ohmyzsh/ohmyzsh.git
+    dest: ~/.oh-my-zsh
+    version: master
+  loop: "{{ ohmyzsh_user }}"
 
 - name: Clone zsh plugin
   ansible.builtin.git:
