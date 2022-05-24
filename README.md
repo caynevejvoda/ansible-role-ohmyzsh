@@ -1,6 +1,6 @@
 # Ansible Role: Oh My ZSH
 
-[![CI](https://github.com/NakashiUGS/ansible-role-ohmyzsh/workflows/CI/badge.svg?event=push)](https://github.com/NakashiUGS/ansible-role-ohmyzsh/actions?query=workflow%3ACI)
+[![CI](https://github.com/caynevejvoda/ansible-role-ohmyzsh/workflows/CI/badge.svg?event=push)](https://github.com/caynevejvoda/ansible-role-ohmyzsh/actions?query=workflow%3ACI)
 
 This role installs ZSH and Oh My Zsh, change the default shell to ZSH and configure it.
 
@@ -17,65 +17,80 @@ It is possible to install and configure ohmyzsh for multiple users.
     ohmyzsh_user: 
       - root
 
-To allow custom plugins, set the variable to true and specify the url's and names.
+The zsh config file is created using a jinja template. To configure this, all options are available as variables. The default values correspond to the default .zshrc.
 
-    ohmyzsh_custom_plugins: false
+    ohmyzsh_path: false
+    ohmyzsh_zsh_theme: robbyrussell
+    ohmyzsh_zsh_theme_random_candidates: false
+    ohmyzsh_case_sensitive: false
+    ohmyzsh_hyphen_insensitive: false
+    ohmyzsh_update_mode: false
+    ohmyzsh_update_zsh_days: false
+    ohmyzsh_disable_magic_functions: false
+    ohmyzsh_disable_ls_colors: false
+    ohmyzsh_disable_auto_title: false
+    ohmyzsh_enable_correction: false
+    ohmyzsh_completion_waiting_dots: false
+    ohmyzsh_disable_untracked_files_dirty: false
+    ohmyzsh_hist_stamps: false
+    ohmyzsh_zsh_custom: false
+    ohmyzsh_plugins: []
+    ohmyzsh_plugin_urls: []
+    ohmyzsh_source: $ZSH/oh-my-zsh.sh
+    ohmyzsh_manpath: false
+    ohmyzsh_lang: false
+    ohmyzsh_preferred_editor: |
+    ohmyzsh_archflags: false
+    ohmyzsh_custom_options: |
+
+### Example Role Variables 
+
+    ohmyzsh_user:
+      - root
+      - alice
+      - bob
+    ohmyzsh_path: $HOME/bin:/usr/local/bin:$PATH
+    ohmyzsh_zsh_theme: agnoster
+    ohmyzsh_zsh_theme_random_candidates: '"robbyrussell" "agnoster"'
+    ohmyzsh_case_sensitive: true
+    ohmyzsh_hyphen_insensitive: true
+    ohmyzsh_update_mode: disabled
+    ohmyzsh_update_zsh_days: 13
+    ohmyzsh_disable_magic_functions: true
+    ohmyzsh_disable_ls_colors: true
+    ohmyzsh_disable_auto_title: true
+    ohmyzsh_enable_correction: true
+    ohmyzsh_completion_waiting_dots: true
+    ohmyzsh_disable_untracked_files_dirty: true
+    ohmyzsh_hist_stamps: '"mm/dd/yyyy"'
+    ohmyzsh_zsh_custom: "/path/to/new-custom-folder"
+    ohmyzsh_plugins:
+      - zsh-autosuggestions
+      - zsh-syntax-highlighting
     ohmyzsh_plugin_urls:
       - https://github.com/zsh-users/zsh-autosuggestions.git
       - https://github.com/zsh-users/zsh-syntax-highlighting.git
-    ohmyzsh_plugin_names:
-      - zsh-autosuggestions
-      - zsh-syntax-highlighting
-
-
-The zsh config file is created using a jinja template. To configure this, all options are available as variables. The default values correspond to the default .zshrc.
-
-    ZSH_THEME: agnoster
-    ZSH_THEME_RANDOM_CANDIDATES_BOL: false
-    CASE_SENSITIVE: false
-    HYPHEN_INSENSITIVE: false
-    DISABLE_AUTO_UPDATE: false
-    DISABLE_UPDATE_PROMPT: false
-    UPDATE_ZSH_DAYS: false
-    DISABLE_MAGIC_FUNCTIONS: false
-    DISABLE_LS_COLORS: false
-    DISABLE_AUTO_TITLE: false
-    ENABLE_CORRECTION: false
-    COMPLETION_WAITING_DOTS: false 
-    DISABLE_UNTRACKED_FILES_DIRTY: false
-    HIST_STAMPS: false
-    ZSH_CUSTOM_BOL: false
-    ZSH_CUSTOM: /path/to/new-custom-folder
-    PLUGINS: 
-    SOURCE: $ZSH/oh-my-zsh.sh
-    MANPATH_BOL: false
-    MANPATH: '"/usr/local/man:$MANPATH"'
-    LANG_BOL: false
-    LANG: en_US.UTF-8
-    PREFERRED_EDITOR_BOL: false
-    PREFERRED_EDITOR: |
+    ohmyzsh_source: $ZSH/oh-my-zsh.sh
+    ohmyzsh_manpath: '"/usr/local/man:$MANPATH"'
+    ohmyzsh_lang: en_US.UTF-8
+    ohmyzsh_preferred_editor: |
       if [[ -n $SSH_CONNECTION ]]; then
         export EDITOR='vim'
       else
         export EDITOR='mvim'
       fi
-    ARCHFLAGS_BOL: false
-    ARCHFLAGS: '"-arch x86_64"'
-    CUSTOM_OPTIONS: |
-      # Example aliases
-      # alias zshconfig="mate ~/.zshrc"
-      # alias ohmyzsh="mate ~/.oh-my-zsh"
-
-The user for whom ZSH is to be installed and configured.
-
+    ohmyzsh_archflags: '"-arch x86_64"'
+    ohmyzsh_custom_options: |
+      alias ls="ls -l"
+      alias la="ls -la"
 ## Dependencies
 
 None.
 ## Example Playbook
-
+    ---
     - hosts: all
       roles:
-        - nakashiugs.ohmyzsh
+        - caynevejvoda.ohmyzsh
 ## License
 
 MIT
