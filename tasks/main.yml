@@ -22,17 +22,6 @@
   become: true
   when: ansible_facts['os_family'] == "Debian"
 
-- name: Create directory
-  ansible.builtin.file:
-    path: ~/.oh-my-zsh
-    owner: "{{ item }}"
-    group: "{{ item }}"
-    mode: 0755
-    state: directory
-  become: true
-  become_user: "{{ item }}"
-  loop: "{{ ohmyzsh_user }}"
-
 - name: Install ohmyzsh
   ansible.builtin.git:
     repo: https://github.com/ohmyzsh/ohmyzsh.git
